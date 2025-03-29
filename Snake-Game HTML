@@ -1,0 +1,30 @@
+const canvas = document.getElementById("gameCanvas"); const ctx = canvas.getContext("2d");
+
+tileSize = 20; let snake = [{ x: 200, y: 200 }]; let direction = "RIGHT"; let food = { x: 100, y: 100 }; let score = 0;
+
+document.addEventListener("keydown", changeDirection); function changeDirection(event) { const key = event.key; if (key === "ArrowUp" && direction !== "DOWN") direction = "UP"; if (key === "ArrowDown" && direction !== "UP") direction = "DOWN"; if (key === "ArrowLeft" && direction !== "RIGHT") direction = "LEFT"; if (key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT"; }
+
+function drawSnake() { ctx.fillStyle = "blue"; snake.forEach((segment) => ctx.fillRect(segment.x, segment.y, tileSize, tileSize)); }
+
+function moveSnake() { let head = { ...snake[0] }; if (direction === "UP") head.y -= tileSize; if (direction === "DOWN") head.y += tileSize; if (direction === "LEFT") head.x -= tileSize; if (direction === "RIGHT") head.x += tileSize;
+
+snake.unshift(head);
+if (head.x === food.x && head.y === food.y) {
+    score += 10;
+    placeFood();
+} else {
+    snake.pop();
+}
+
+}
+
+function placeFood() { food.x = Math.floor(Math.random() * (canvas.width / tileSize)) * tileSize; food.y = Math.floor(Math.random() * (canvas.height / tileSize)) * tileSize; }
+
+function drawFood() { ctx.fillStyle = "red"; ctx.fillRect(food.x, food.y, tileSize, tileSize); }
+
+function checkCollision() { let head = snake[0]; if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height) return true; for (let i = 1; i < snake.length; i++) { if (head.x === snake[i].x && head.y === snake[i].y) return true; } return false; }
+
+function gameLoop() { if (checkCollision()) { alert("Game Over! The teacher got too stressed!"); return; } ctx.clearRect(0, 0, canvas.width, canvas.height); drawFood(); moveSnake(); drawSnake(); setTimeout(gameLoop, 100); }
+
+placeFood(); gameLoop();
+
